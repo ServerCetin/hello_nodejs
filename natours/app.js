@@ -2,6 +2,9 @@ const fs = require('fs');
 const express = require('express');
 const morgan = require('morgan') //for loggin
 
+const tourRouter = require('./routes/tourRoutes')
+const userRouter = require('./routes/userRoutes')
+
 const app = express();
 
 // MIDDLEWARES
@@ -19,142 +22,8 @@ app.use((req,res,next)=>{
   next();
 })
 
-
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
-
-//Route handlers
-
-const getAllTours = (req, res) => {
-  res.json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
-};
-
-const getTour = (req, res) => {
-  //const pId = req.params.id;
-
-  const id = req.params.id * 1; //converts string to int automatically
-  const tour = tours.find(t => t.id === id);
-
-  res.status(200).send({
-    status: 'success',
-    data: tour
-  });
-
-  // let wantedTour;
-  //
-  // tours.forEach(tour => {
-  //   if(tour.id == pId){wantedTour = tour}
-  // });
-  //
-  // res.status(200).send({
-  //   status: 'success',
-  //   data: {wantedTour}
-  // })
-};
-
-const createTour = (req, res) => {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
-
-  tours.push(newTour);
-
-  fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
-    res.status(201).send({
-      status: 'success',
-      data: {
-        tour: newTour
-      }
-    });
-  });
-};
-
-const updateTour = (req, res) => {
-  const id = req.params.id * 1; //converts string to int automatically
-  const tour = tours.find(t => t.id === id);
-
-  res.status(200).send({
-    status: 'success',
-    data: 'changed tour here'
-  });
-};
-
-const deleteTour = (req, res) => {
-  const id = req.params.id * 1; //converts string to int automatically
-  const tour = tours.find(t => t.id === id);
-
-  res.status(204).send({
-    status: 'success',
-    data: null
-  });
-};
-
-const getAllUsers = (req, res) => {
-  res.status(500).send({
-    status: 'error',
-    message: 'This route is not implemented yet!',
-  })
-};
-const createUser = (req, res) => {
-  res.status(500).send({
-    status: 'error',
-    message: 'This route is not implemented yet!',
-  })
-};
-const getUser = (req, res) => {
-  res.status(500).send({
-    status: 'error',
-    message: 'This route is not implemented yet!',
-  })
-};
-const updateUser = (req, res) => {
-  res.status(500).send({
-    status: 'error',
-    message: 'This route is not implemented yet!',
-  })
-};
-const deleteUser = (req, res) => {
-  res.status(500).send({
-    status: 'error',
-    message: 'This route is not implemented yet!',
-  })
-};
-
-
-
-// Routes
-
-const tourRouter = express.Router();
-const userRouter = express.Router();
-
-tourRouter.route('/')
-  .get(getAllTours)
-  .post(createTour);
-
-tourRouter.route('/:id')
-  .get(getTour)
-  .put(updateTour)
-  .delete(deleteTour)
-
-userRouter.route('/')
-  .get(getAllUsers)
-  .post(createUser);
-
-userRouter.route('/:id')
-  .get(getUser)
-  .put(updateUser)
-  .delete(deleteUser)
-
+// routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-const port = 3000;
-
-app.listen(port, () => {
-  console.log('Server is listening on ${port}');
-});
+module.exports = app;
