@@ -1,26 +1,25 @@
-const fs = require('fs')
+const fs = require('fs');
+const APIFeatures = require('../utils/apiFeatures');
 
 let tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
-
-
-exports.checkId = (req,res,next,val) => {
-  if(req.params.id * 1 > tours.length)
+exports.checkId = (req, res, next, val) => {
+  if (req.params.id * 1 > tours.length)
     return res.status(404).json({
       status: 'error',
       message: 'Invalid ID'
     });
-  next()
-}
+  next();
+};
 
-exports.checkBody = (req,res,next) => {
-  if(!req.body.name || !req.body.price)
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price)
     return res.status(404).json({
       status: 'fail',
       message: 'Missing name or price'
     });
-  next()
-}
+  next();
+};
 
 
 //Route handlers
@@ -30,59 +29,42 @@ exports.checkBody = (req,res,next) => {
 // greater than equal gte, gt, lte, lt
 
 exports.alisTopTours = (req, res, next) => { // we manipulate req and query will change
-  req.query.limit = 5
-  req.query.sort = "name,price"
-  req.query.fields = 'name,price,difficulty'
-  next()
-}
+  req.query.limit = 5;
+  req.query.sort = 'name,price';
+  req.query.fields = 'name,price,difficulty';
+  next();
+};
 
-exports.getAllTours = (req, res) => {
-  //filtering
-  // const queryObject = {...req.query}
-  // const excludedFields = ['maxGroupSize']
-  // excludedFields.forEach(e => delete queryObject[e])
-  //
-  // //advanced filtering
-  // let queryString = JSON.stringify(queryObject)
-  // queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
-  // console.log(queryString)
+exports.getAllTours = async (req, res) => {
+  try {
+    // const features = new APIFeatures(tours.find(), req.query)
+    //   .filter()
+    //   .sort()
+    //   .limitFields()
+    //   .paginate();
+    //
+    // const t = await features.query;
 
-  // console.log(queryObject)
+    res.json({
+      status: 'success',
+      requestedAt: req.requestTime,
+      results: tours.length,
+      data: {
+        tours
+      }
+    });
+  } catch (e) {
+    console.log(e)
+    res.json({
+      status: 'fail',
+      requestedAt: req.requestTime,
+      error: {
+        e
+      }
+    });
+  }
 
-  //sorting
-  // if(req.query.sort){
-  //   const sortBy = req.query.sort.split(',').join(' ')
-  //   console.log(sortBy)
-  //   // then sort tours
-  // }
 
-  //field limiting
-  // if(req.query.fields){
-  //   const fields = req.query.fields.split(',')
-  //   console.log(fields)
-  //   //get tours with tthe fields
-  // }
-
-  //pagination page=2,limit=50
-  // const page = req.query.page * 1 || 1
-  // const limit = req.query.limit * 1 || 1
-  // const skip = (page - 1) * limit
-  //
-  // tours = tours.skip(skip).limit(limit)
-  //
-  // if (req.query.page){
-  //   const numTours = await tours.countDocuments() //mongodb
-  //   if(skip>numTours) throw new Error('This page does not exist')
-  // }
-
-  res.json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
 };
 
 exports.getTour = (req, res) => {
