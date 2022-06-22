@@ -1,6 +1,7 @@
 const fs = require('fs')
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
+let tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
+
 
 
 exports.checkId = (req,res,next,val) => {
@@ -24,7 +25,56 @@ exports.checkBody = (req,res,next) => {
 
 //Route handlers
 
+//GET /api/v1/tours?test=testval&Price[gte]=132 200 31.125 ms - 8741
+//get price > 132
+// greater than equal gte, gt, lte, lt
+
+exports.alisTopTours = (req, res, next) => { // we manipulate req and query will change
+  req.query.limit = 5
+  req.query.sort = "name,price"
+  req.query.fields = 'name,price,difficulty'
+  next()
+}
+
 exports.getAllTours = (req, res) => {
+  //filtering
+  // const queryObject = {...req.query}
+  // const excludedFields = ['maxGroupSize']
+  // excludedFields.forEach(e => delete queryObject[e])
+  //
+  // //advanced filtering
+  // let queryString = JSON.stringify(queryObject)
+  // queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
+  // console.log(queryString)
+
+  // console.log(queryObject)
+
+  //sorting
+  // if(req.query.sort){
+  //   const sortBy = req.query.sort.split(',').join(' ')
+  //   console.log(sortBy)
+  //   // then sort tours
+  // }
+
+  //field limiting
+  // if(req.query.fields){
+  //   const fields = req.query.fields.split(',')
+  //   console.log(fields)
+  //   //get tours with tthe fields
+  // }
+
+  //pagination page=2,limit=50
+  // const page = req.query.page * 1 || 1
+  // const limit = req.query.limit * 1 || 1
+  // const skip = (page - 1) * limit
+  //
+  // tours = tours.skip(skip).limit(limit)
+  //
+  // if (req.query.page){
+  //   const numTours = await tours.countDocuments() //mongodb
+  //   if(skip>numTours) throw new Error('This page does not exist')
+  // }
+
   res.json({
     status: 'success',
     requestedAt: req.requestTime,

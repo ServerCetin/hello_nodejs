@@ -8,7 +8,9 @@ const router = express.Router();
 //   next();
 // })
 
-router.param('id', tourController.checkId);
+// router.param('id', tourController.checkId);
+
+router.route('/top-10-tour').get(tourController.alisTopTours, tourController.getAllTours) //alias
 
 router.route('/')
   .get(tourController.getAllTours)
